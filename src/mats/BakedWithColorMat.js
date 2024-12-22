@@ -7,8 +7,9 @@ const uniforms = {
   uReveal1: 0.5,
   uReveal2: 0.5,
   uReveal3: 0.5,
-  uBakedTex: null,
+  uDarkTex: null,
   uLightMapTex: null,
+  uColorTex: null,
   uLight1Strength: 1,
   uLight2Strength: 1,
   uLight3Strength: 1,
@@ -31,6 +32,17 @@ const vertShader = /* glsl */`
 `;
 
 const fragShader = /* glsl */`
+  float blendSoftLight(float base, float blend) {
+    return (blend<0.5)?(2.0*base*blend+base*base*(1.0-2.0*blend)):(sqrt(base)*(2.0*blend-1.0)+2.0*base*(1.0-blend));
+  }
+
+  vec3 blendSoftLight(vec3 base, vec3 blend) {
+    return vec3(blendSoftLight(base.r,blend.r),blendSoftLight(base.g,blend.g),blendSoftLight(base.b,blend.b));
+  }
+
+  vec3 blendSoftLight(vec3 base, vec3 blend, float opacity) {
+    return (blendSoftLight(base, blend) * opacity + base * (1.0 - opacity));
+  }
 
   float blendAdd(float base, float blend) {
     return min(base+blend,1.0);
@@ -45,8 +57,9 @@ const fragShader = /* glsl */`
   }
 
   varying vec2 vUv;
-  uniform sampler2D uBakedTex;
+  uniform sampler2D uDarkTex;
   uniform sampler2D uLightMapTex;
+  uniform sampler2D uColorTex;
   uniform float uLight1Strength;
   uniform float uLight2Strength;
   uniform float uLight3Strength;
@@ -58,29 +71,35 @@ const fragShader = /* glsl */`
   uniform vec3 uLight3Color;
 
   void main() {
-    vec3 bakedColor = texture2D(uBakedTex, vUv).rgb;
+    vec3 darkColor = texture2D(uDarkTex, vUv).rgb;
     vec3 lightColor = texture2D(uLightMapTex, vUv).rgb;
+    vec3 flatColor = texture2D(uColorTex, vUv).rgb;
 
     // the baked maps are too bright, so we darken them a bit
-    //bakedColor *= .5;
+    //darkColor *= .5;
+    flatColor *= .4;
     lightColor *= .7;
+    
+    vec3 color1 = blendSoftLight(flatColor, uLight1Color);
+    vec3 color2 = blendSoftLight(flatColor, uLight2Color);
+    vec3 color3 = blendSoftLight(flatColor, uLight3Color);
     
     float light1Strength = lightColor.g * uLight1Strength * uReveal1;
     float light2Strength = lightColor.b * uLight2Strength * uReveal2;
     float light3Strength = lightColor.r * uLight3Strength * uReveal3;
 
-    bakedColor = blendAdd(bakedColor, uLight1Color, light1Strength); 
-    bakedColor = blendAdd(bakedColor, uLight2Color, light2Strength);
-    bakedColor = blendAdd(bakedColor, uLight3Color, light3Strength);
+    darkColor = blendAdd(darkColor, color1, light1Strength); 
+    darkColor = blendAdd(darkColor, color2, light2Strength);
+    darkColor = blendAdd(darkColor, color3, light3Strength);
     
-    gl_FragColor = vec4(bakedColor, 1.);
+    gl_FragColor = vec4(darkColor, 1.);
   }
 `;
 
-const BakedMat = shaderMaterial(uniforms, vertShader, fragShader);
+const BakedWithColorMat = shaderMaterial(uniforms, vertShader, fragShader);
 
-BakedMat.key = guid.generate();
+BakedWithColorMat.key = guid.generate();
 
-extend({ BakedMat });
+extend({ BakedWithColorMat });
 
-export default BakedMat;
+export default BakedWithColorMat;

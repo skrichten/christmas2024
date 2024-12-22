@@ -12,7 +12,7 @@ const uniforms = {
   uTurbTex: null,
   uSpeed: 0.1,
   uEndFade: 0.3,
-  uReveal: 0.5,
+  uReveal: 0,
   transparent: true,
   depthWrite: false,
 };
