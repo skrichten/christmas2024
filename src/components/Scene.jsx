@@ -22,92 +22,79 @@ export const Scene = () => {
   const reveal3Ref = React.useRef();
   const groundMatRef = React.useRef();
   const houseMatRef = React.useRef();
-  const aniReady = React.useRef(true);
-
+  const aniReady = React.useRef(false);
 
   useGSAP(() => {
-    const t1Config = {
+    const forwardProps = {
       value: 1.2,
-      duration: .4,
+      duration: 3,
       ease: 'power2.in',
+    }
+    const toggleProps = {
+      value: 0,
+      duration: 2,
+      ease: 'power2.out',
+    };
+    const t1Config = {
+      ...forwardProps,
       paused: true,
-      overwrite: true,
       onUpdate: function() {
-        groundMatRef.current.uniforms.uReveal1.value = this.ratio;
-        houseMatRef.current.uniforms.uReveal1.value = this.ratio;
+        const v = tree1Ref.current.uniforms.uReveal.value;
+        groundMatRef.current.uniforms.uReveal1.value = v;
+        houseMatRef.current.uniforms.uReveal1.value = v;
       }
     };
     const t1 = gsap.to(tree1Ref.current.uniforms.uReveal, t1Config);
 
     const t2Config = {
-      value: 1.2,
-      duration: .4,
-      ease: 'power2.in',
+      ...forwardProps,
       paused: true,
-      overwrite: true,
       onUpdate: function() {
-        groundMatRef.current.uniforms.uReveal2.value = this.ratio;
-        houseMatRef.current.uniforms.uReveal2.value = this.ratio;
+        const v = tree2Ref.current.uniforms.uReveal.value;
+        groundMatRef.current.uniforms.uReveal2.value = v;
+        houseMatRef.current.uniforms.uReveal2.value = v;
       }
     };
     const t2 = gsap.to(tree2Ref.current.uniforms.uReveal, t2Config);
 
     const t3Config = {
-      value: 1.2,
-      duration: .4,
-      ease: 'power2.in',
+      ...forwardProps,
       paused: true,
-      overwrite: true,
       onUpdate: function() {
-        groundMatRef.current.uniforms.uReveal3.value = this.ratio;
-        houseMatRef.current.uniforms.uReveal3.value = this.ratio;
+        const v = tree3Ref.current.uniforms.uReveal.value;
+        groundMatRef.current.uniforms.uReveal3.value = v;
+        houseMatRef.current.uniforms.uReveal3.value = v;
       }
     };
     const t3 = gsap.to(tree3Ref.current.uniforms.uReveal, t3Config);
-
-    reveal1Ref.current = t1;
-    reveal2Ref.current = t2;
-    reveal3Ref.current = t3;
-
-    console.log('reveal1Ref', reveal1Ref.current);
-
     
-    const tl = gsap.timeline({
+    gsap.timeline({
       delay: 1,
-      //autoRemoveChildren: true,
+      autoRemoveChildren: true,
       //paused: true,
       onComplete: function() {
         aniReady.current = true;
-        //reveal1Ref.current = gsap.to(tree1Ref.current.uniforms.uReveal, t1Config);
-        //reveal2Ref.current = gsap.to(tree2Ref.current.uniforms.uReveal, t2Config);
-        //reveal3Ref.current = gsap.to(tree3Ref.current.uniforms.uReveal, t3Config);
+        this.kill();
+        reveal1Ref.current = gsap.to(tree1Ref.current.uniforms.uReveal, {...t1Config, ...toggleProps});
+        reveal2Ref.current = gsap.to(tree2Ref.current.uniforms.uReveal, {...t2Config, ...toggleProps});
+        reveal3Ref.current = gsap.to(tree3Ref.current.uniforms.uReveal, {...t3Config, ...toggleProps});
       }
     })
       .add(t3.play())
       .add(t2.play())
-      .add(t1.play()); 
-      
-     
-      /*
-    t1.play();
-    t2.play();
-    t3.play(); */
-  });
-    
+      .add(t1.play());  
+  });    
 
   const config = useControls({
     
     toggle1: {
       value: true,
       onChange: (value) => {
-        console.log('toggle1', reveal1Ref.current);
         if (!aniReady.current) return;
-        console.log('toggle1', value);
         if (value) {
-          reveal1Ref.current.play();
+          reveal1Ref.current.reverse();
         } else {
-          console.log('reverse', reveal1Ref.current.progress());
-          reveal1Ref.current.restart();
+          reveal1Ref.current.play();
         }
       }
     },
@@ -116,9 +103,9 @@ export const Scene = () => {
       onChange: (value) => {
         if (!aniReady.current) return;
         if (value) {
-          reveal2Ref.current.play();
-        } else {
           reveal2Ref.current.reverse();
+        } else {
+          reveal2Ref.current.play();
         }
       }
     },
@@ -127,58 +114,16 @@ export const Scene = () => {
       onChange: (value) => {
         if (!aniReady.current) return;
         if (value) {
-          reveal3Ref.current.play();
-        } else {
           reveal3Ref.current.reverse();
+        } else {
+          reveal3Ref.current.play();
         }
       }
     },
-
-    /*
-    globalReveal: { 
-      value: 0, min: 0, max: 1.2, step: 0.001,
-      onChange: (value) => {
-        tree1ref.current.uniforms.uReveal.value = value;
-        tree2Ref.current.uniforms.uReveal.value = value;
-        tree3Ref.current.uniforms.uReveal.value = value;
-        groundMatRef.current.uniforms.uReveal1.value = value;
-        groundMatRef.current.uniforms.uReveal2.value = value;
-        groundMatRef.current.uniforms.uReveal3.value = value;
-        houseMatRef.current.uniforms.uReveal1.value = value;
-        houseMatRef.current.uniforms.uReveal2.value = value;
-        houseMatRef.current.uniforms.uReveal3.value = value;
-      }
-    },
-    RevealTree1: { 
-      value: 0, min: 0, max: 1.2, step: 0.001, label: 'Reveal Tree 1',
-      onChange: (value) => {
-        tree1ref.current.uniforms.uReveal.value = value;
-        groundMatRef.current.uniforms.uReveal1.value = value;
-        houseMatRef.current.uniforms.uReveal1.value = value;
-      } 
-    },
-    RevealTree2: {
-      value: 0, min: 0, max: 1.2, step: 0.001, label: 'Reveal Tree 2',
-      onChange: (value) => {
-        tree2Ref.current.uniforms.uReveal.value = value;
-        groundMatRef.current.uniforms.uReveal2.value = value;
-        houseMatRef.current.uniforms.uReveal2.value = value;
-      }
-    },
-    RevealTree3: {
-      value: 0, min: 0, max: 1.2, step: 0.001, label: 'Reveal Tree 3',
-      onChange: (value) => {
-        tree3Ref.current.uniforms.uReveal.value = value;
-        groundMatRef.current.uniforms.uReveal3.value = value;
-        houseMatRef.current.uniforms.uReveal3.value = value;
-      }
-    },
-
-    */
    
-    uLight1Strength: { value: 1.78, min: 0, max: 2, step: 0.001, label: 'Light 1 Strength' },
-    uLight2Strength: { value: 2, min: 0, max: 2, step: 0.001, label: 'Light 2 Strength' },
-    uLight3Strength: { value: 1.4, min: 0, max: 2, step: 0.001, label: 'Light 3 Strength' }, 
+    uLight1Strength: { value: 1.78, min: .2, max: 2, step: 0.001, label: 'Light 1 Strength' },
+    uLight2Strength: { value: 2, min: .2, max: 2, step: 0.001, label: 'Light 2 Strength' },
+    uLight3Strength: { value: 1.4, min: .2, max: 2, step: 0.001, label: 'Light 3 Strength' }, 
     uLight1Color: { 
       value: '#ffb721', label: 'Light 1 Color',
       onChange: (value) => {
@@ -310,3 +255,48 @@ export const Scene = () => {
     </>
   )
 };
+
+
+
+
+/*
+    globalReveal: { 
+      value: 0, min: 0, max: 1.2, step: 0.001,
+      onChange: (value) => {
+        tree1ref.current.uniforms.uReveal.value = value;
+        tree2Ref.current.uniforms.uReveal.value = value;
+        tree3Ref.current.uniforms.uReveal.value = value;
+        groundMatRef.current.uniforms.uReveal1.value = value;
+        groundMatRef.current.uniforms.uReveal2.value = value;
+        groundMatRef.current.uniforms.uReveal3.value = value;
+        houseMatRef.current.uniforms.uReveal1.value = value;
+        houseMatRef.current.uniforms.uReveal2.value = value;
+        houseMatRef.current.uniforms.uReveal3.value = value;
+      }
+    },
+    RevealTree1: { 
+      value: 0, min: 0, max: 1.2, step: 0.001, label: 'Reveal Tree 1',
+      onChange: (value) => {
+        tree1ref.current.uniforms.uReveal.value = value;
+        groundMatRef.current.uniforms.uReveal1.value = value;
+        houseMatRef.current.uniforms.uReveal1.value = value;
+      } 
+    },
+    RevealTree2: {
+      value: 0, min: 0, max: 1.2, step: 0.001, label: 'Reveal Tree 2',
+      onChange: (value) => {
+        tree2Ref.current.uniforms.uReveal.value = value;
+        groundMatRef.current.uniforms.uReveal2.value = value;
+        houseMatRef.current.uniforms.uReveal2.value = value;
+      }
+    },
+    RevealTree3: {
+      value: 0, min: 0, max: 1.2, step: 0.001, label: 'Reveal Tree 3',
+      onChange: (value) => {
+        tree3Ref.current.uniforms.uReveal.value = value;
+        groundMatRef.current.uniforms.uReveal3.value = value;
+        houseMatRef.current.uniforms.uReveal3.value = value;
+      }
+    },
+
+    */
