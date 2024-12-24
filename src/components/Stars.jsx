@@ -5,6 +5,7 @@ import { AdditiveBlending, Color, PlaneGeometry } from 'three';
 
 import StarMatBuilder from '../mats/StarMatBuilder';
 import PointsAttr from './PointsAttr';
+import gsap from 'gsap';
 
 const StarsMat = StarMatBuilder(false);
 extend({ StarsMat });
@@ -16,10 +17,16 @@ const colors = {
   pCol2: new Color(0x5000ff),
 };
 
+
 const Stars = () => {
   const matRef = useRef();
-  const gl = useThree((state) => state.gl);
+  const viewport = useThree((state) => state.viewport);
   const { nodes } = useGLTF('/stars.glb');
+  let minSize = gsap.utils.mapRange(20, 27, .1, .2, viewport.width);
+  minSize = gsap.utils.clamp(.1, .3, minSize);
+
+  console.log('h', viewport.width);
+  console.log('size', minSize);
 
   useFrame((state) => {
     if (matRef.current) {
@@ -44,7 +51,7 @@ const Stars = () => {
       </instancedBufferGeometry>
       <starsMat
         attach="material"
-        uSize={.3 / gl.getPixelRatio()}
+        uSize={minSize}
         //uSize={2}
         uColor1={colors.pCol1}
         uColor2={colors.pCol2}

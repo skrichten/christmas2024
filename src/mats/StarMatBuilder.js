@@ -69,9 +69,10 @@ const StarMatBuilder = (usePoints = true) => {
         //animate size over time
         //float scale = mix(uSize, uSize * size, cycle);
         //float scale = uSize * size * cycle;
-        float scale = max(uSize * size * cycle * .25, .1);
+        float scale = max(size * uSize * cycle * .6, uSize);
 
         mvPosition.xyz += position * scale;
+        //mvPosition.xyz += position;
         gl_Position = projectionMatrix * mvPosition;
       `
       }
@@ -108,7 +109,7 @@ const StarMatBuilder = (usePoints = true) => {
       }
       float rays1 = Rays(c, uRayStrength);
       float rays2 = Rays(c * Ro(3.1415/4.), uRayStrength * .1);
-      float strength = distance(vUv, vec2(0.6));
+      float strength = distance(vUv, vec2(0.5));
       float cRays = (rays1 + rays2) * smoothstep(.8, .2, strength);
 
       strength = 1. - strength;

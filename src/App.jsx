@@ -18,8 +18,8 @@ addEffect((t) => {
 
 const defaultGlProps = {
   powerPreference: "high-performance",
-  alpha: false,
-  flat: true,
+  alpha: true,
+  flat: false,
 };
 
 function App() {
