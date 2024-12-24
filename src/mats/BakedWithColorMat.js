@@ -7,15 +7,18 @@ const uniforms = {
   uReveal1: 0.5,
   uReveal2: 0.5,
   uReveal3: 0.5,
+  uReveal4: 0,
   uDarkTex: null,
   uLightMapTex: null,
   uColorTex: null,
   uLight1Strength: 1,
   uLight2Strength: 1,
   uLight3Strength: 1,
+  uLight4Strength: 1,
   uLight1Color: new Color(1, 0, 0),
   uLight2Color: new Color(0, 1, 0),
   uLight3Color: new Color(0, 0, 1),
+  uLight4Color: new Color(0, 0, 0),
 };
 
 const vertShader = /* glsl */`
@@ -63,16 +66,19 @@ const fragShader = /* glsl */`
   uniform float uLight1Strength;
   uniform float uLight2Strength;
   uniform float uLight3Strength;
+  uniform float uLight4Strength;
   uniform float uReveal1;
   uniform float uReveal2;
   uniform float uReveal3;
+  uniform float uReveal4;
   uniform vec3 uLight1Color;
   uniform vec3 uLight2Color;
   uniform vec3 uLight3Color;
+  uniform vec3 uLight4Color;
 
   void main() {
     vec3 darkColor = texture2D(uDarkTex, vUv).rgb;
-    vec3 lightColor = texture2D(uLightMapTex, vUv).rgb;
+    vec4 lightColor = texture2D(uLightMapTex, vUv);
     vec3 flatColor = texture2D(uColorTex, vUv).rgb;
 
     // the baked maps are too bright, so we darken them a bit
@@ -83,14 +89,17 @@ const fragShader = /* glsl */`
     vec3 color1 = blendSoftLight(flatColor, uLight1Color);
     vec3 color2 = blendSoftLight(flatColor, uLight2Color);
     vec3 color3 = blendSoftLight(flatColor, uLight3Color);
+    vec3 color4 = blendSoftLight(flatColor, uLight4Color);
     
     float light1Strength = lightColor.g * uLight1Strength * uReveal1;
     float light2Strength = lightColor.b * uLight2Strength * uReveal2;
     float light3Strength = lightColor.r * uLight3Strength * uReveal3;
+    float light4Strength = lightColor.a * uLight4Strength * uReveal4;
 
     darkColor = blendAdd(darkColor, color1, light1Strength); 
     darkColor = blendAdd(darkColor, color2, light2Strength);
     darkColor = blendAdd(darkColor, color3, light3Strength);
+    darkColor = blendAdd(darkColor, color4, light4Strength);
     
     gl_FragColor = vec4(darkColor, 1.);
   }

@@ -11,7 +11,7 @@ export const Tree = React.forwardRef(({ uniforms = {}, ...props }, ref) => {
 
   return (
     <CurveParticles 
-      count={5000} 
+      count={7000} 
       w={256} 
       h={2} 
       uCurve1Tex={exr} 
