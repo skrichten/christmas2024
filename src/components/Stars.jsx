@@ -25,9 +25,6 @@ const Stars = () => {
   let minSize = gsap.utils.mapRange(20, 27, .1, .2, viewport.width);
   minSize = gsap.utils.clamp(.1, .3, minSize);
 
-  console.log('h', viewport.width);
-  console.log('size', minSize);
-
   useFrame((state) => {
     if (matRef.current) {
       matRef.current.uniforms.uTime.value = state.clock.getElapsedTime();
