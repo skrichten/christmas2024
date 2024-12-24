@@ -35,7 +35,15 @@ function App() {
           gl={defaultGlProps}
         >
           <Suspense fallback={null}>
-            <OrbitControls />
+            <OrbitControls 
+              enablePan={false} 
+              minPolarAngle={1} 
+              maxPolarAngle={1.67}
+              minAzimuthAngle={-Math.PI / 3}
+              maxAzimuthAngle={Math.PI / 5}
+              minDistance={3} 
+              maxDistance={24}
+            />
             <Effects enabled={true} />
             <Scene />
             <Smoke position={[-3.43, 4., -8.56]} />
