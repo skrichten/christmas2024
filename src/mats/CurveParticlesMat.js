@@ -12,7 +12,8 @@ const uniforms = {
   uTurbTex: null,
   uSpeed: 0.1,
   uEndFade: 0.3,
-  uReveal: 0.5,
+  uReveal: 0,
+  uTurbFactor: .17,
   transparent: true,
   depthWrite: false,
 };
@@ -23,6 +24,7 @@ const vertShader = /* glsl */`
   attribute float aTurbPos;
   uniform sampler2D uCurve1Tex;
   uniform sampler2D uTurbTex;
+  uniform float uTurbFactor;
   uniform float uTime;
   uniform float uSpeed;
   uniform float uSize;
@@ -57,13 +59,12 @@ const vertShader = /* glsl */`
     vec2 curveUv1 = getUV(curveSampleWrapped, uvOffset);
     vec3 curvePosition1 = texture2D(uCurve1Tex, curveUv1).xyz;
     vec2 turbUv1 = getUV(turbSampleWrapped, uvOffset);
-    vec4 turbOffset = texture2D(uTurbTex, turbUv1);
+    vec3 turbOffset = texture2D(uTurbTex, turbUv1).xyz;
     
+    curvePosition1 += turbOffset * uTurbFactor;
     vec4 modelPosition = modelMatrix * vec4(curvePosition1, 1.0);
-    modelPosition += turbOffset * .15;
     vec4 viewPosition = viewMatrix * modelPosition;
     vec4 projectedPosition = projectionMatrix * viewPosition;
-
     gl_Position = projectedPosition;
 
     // Size
