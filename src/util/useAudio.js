@@ -6,7 +6,7 @@ export default function useAudio(url, fftSize) {
   useEffect(() => {
     if (!url) return;
     // Connect the gain node, which plays the audio
-    audio.gain.connect(audio.context.destination);
+    //audio.gain.connect(audio.context.destination);
     // Disconnect it on unmount
     return () => {
       audio.gain.disconnect();
@@ -42,6 +42,10 @@ async function createAudio(url, fftSize) {
     source,
     gain,
     data,
+    started: false,
+    play: () => {
+      gain.connect(context.destination);
+    },
     // This function gets called every frame per audio source
     update: () => {
       analyser.getByteFrequencyData(data)

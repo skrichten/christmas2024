@@ -18,4 +18,7 @@ export const useGeneralStore = create((set) => ({
 
   groundMat: null,
   setGroundMat: (value) => set({ groundMat: value }),
+
+  enableAudio: null,
+  setEnableAudio: (value) => set({ enableAudio: value }),
 }));

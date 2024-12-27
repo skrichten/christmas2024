@@ -12,22 +12,23 @@ body {
   overflow: hidden;
 }
 
-.infoBtn {
-  position: fixed;
-  bottom: 10px;
-  left: 10px;
-  overflow: hidden;
-  z-index: 10;
+.buttonReset {
   background: none;
   border: none;
   color: inherit;
   font: inherit;
   line-height: normal;
-  overflow: visible;
-  padding: 20px;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+}
+
+.infoBtn {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  z-index: 10;
+  padding: 20px;
 }
 
 .infoBox {
@@ -51,4 +52,42 @@ body {
 
 .hide {
   display: none;
-} 
+}
+
+.introBg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/introBG.webp') no-repeat;
+  background-size: cover;
+  z-index: 10;
+}
+
+.intro {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  color: white;
+  padding: 30px 40px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 600px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Make a christmas style button */
+.startBtn {
+  background-color: #4CAF50;
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 4px 4px;
+  cursor: pointer;
+  border-radius: 12px;
+}

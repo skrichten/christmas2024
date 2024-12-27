@@ -24,6 +24,12 @@ const defaultGlProps = {
 
 function App() {
   const { animationComplete } = useGeneralStore();
+  const { setEnableAudio } = useGeneralStore();
+
+  const start = (audio) => {
+    gsap.to('.introBg', { duration: 1, autoAlpha: 0, pointerEvents: 'none' });
+    setEnableAudio(audio);
+  }
 
   return (
     <main>
@@ -51,7 +57,7 @@ function App() {
           </Suspense>
         </Canvas>
       </div>
-      <button className="infoBtn" 
+      <button className="buttonReset infoBtn" 
         onPointerOver={() => document.querySelector('.infoBox').classList.toggle('show')}
         onPointerOut={() => document.querySelector('.infoBox').classList.toggle('show')}
       >
@@ -84,7 +90,13 @@ function App() {
           Music from <a target="_blank" href="https://uppbeat.io/t/soundroll/cozy-holidays">#Uppbeat</a>:<br/>          
           License code: FVW3UCW25WA7INCX
         </p>
-      </div>    
+      </div>
+      <div className="introBg">
+        <div className="intro">
+          <button className="buttonReset startBtn" onClick={() => start(true)}>Start with audio</button>
+          <button className="buttonReset startBtn" onClick={() => start(false)}>Start with no audio</button>
+        </div>
+      </div> 
     </main>
   )
 }

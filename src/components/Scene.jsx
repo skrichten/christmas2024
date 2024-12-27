@@ -31,14 +31,15 @@ export const Scene = () => {
   const houseLightsRef = React.useRef();
   const aniReady = React.useRef(false);
   const [
-    setHouseMat, setGroundMat, setTree1Mat, setTree2Mat, setTree3Mat, setAnimationComplete
+    setHouseMat, setGroundMat, setTree1Mat, setTree2Mat, setTree3Mat, setAnimationComplete, enableAudio
   ] = useGeneralStore(useShallow((s) => [
-    s.setHouseMat, s.setGroundMat, s.setTree1Mat, s.setTree2Mat, s.setTree3Mat, s.setAnimationComplete
+    s.setHouseMat, s.setGroundMat, s.setTree1Mat, s.setTree2Mat, s.setTree3Mat, s.setAnimationComplete, s.enableAudio
   ]));
 
-  const timeScale = 1.01;
+  const timeScale = 1;
   // INTRO ANIMATION
   useGSAP(() => {
+    if (enableAudio === null) return;
     const forwardProps = {
       value: 1.2,
       duration: 3 * timeScale,
@@ -118,7 +119,7 @@ export const Scene = () => {
       .add(t3.play())
       .add(t2.play())
       .add(t1.play());  
-  });    
+  }, [enableAudio]);    
 
   // CONTROLS
   useControls(

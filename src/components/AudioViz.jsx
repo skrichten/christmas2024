@@ -8,16 +8,18 @@ import gsap from 'gsap';
 
 export const AudioViz = () => {
   const [
-    tree1Mat, tree2Mat, tree3Mat, houseMat, groundMat
+    tree1Mat, tree2Mat, tree3Mat, houseMat, groundMat, enableAudio
   ] = useGeneralStore(useShallow((s) => [
-    s.tree1Mat, s.tree2Mat, s.tree3Mat, s.houseMat, s.groundMat
+    s.tree1Mat, s.tree2Mat, s.tree3Mat, s.houseMat, s.groundMat, s.enableAudio
   ]));
   const savedVal = React.useRef(false);
-  const [audioURL, setAudioURL] = React.useState(false);
-  const audio = useAudio(audioURL, 32);
+  const audio = useAudio('/cozy-holidays.mp3', 32);
+  console.log(enableAudio);
+  const delay = enableAudio === true ? 4000 : 0;
 
   const handleToggle = (val) => {
-    if (!val && audio) {
+    if (!val && audio?.started) {
+      //console.log('audio suspended');
       audio.context.suspend();
       setTimeout(() => {
         tree2Mat.uniforms.uTurbFactor.value = .17;
@@ -27,41 +29,49 @@ export const AudioViz = () => {
       }, 200);
     } else if (val) {
       savedVal.current = houseMat.uniforms.uLight4Strength.value;
-      if (audio && audioURL) {
+      if (audio && audio.started) {
+        //console.log('audio resumed');
         audio.context.resume();
       } else {
-        setAudioURL('/cozy-holidays.mp3');
+        setTimeout(() => {
+          audio.gain.connect(audio.context.destination);
+          audio.context.resume();
+          audio.started = true;
+          //console.log('audio started First time');
+        }, delay);
       }
     }
   };
 
-  const ctrls = useControls('Audio', {
+  const [ctrls, setCtrls] = useControls(() => ({
     musicToggle: {
       label: 'Music',
       value: false,
       onChange: handleToggle,
       transient: false,
     },
-    
-  }, { collapsed: true }, [audio, audioURL, setAudioURL, houseMat]);
+  }), { collapsed: true }, [enableAudio]);
+
+  React.useEffect(() => {
+    setCtrls({ musicToggle: enableAudio === true ? true : false });
+  }, [enableAudio, setCtrls]);
 
   useFrame(() => {
-    if (!tree1Mat || !audio || !ctrls.musicToggle) return;
-
+    if (!tree1Mat || !audio?.started || !ctrls.musicToggle) return;
+    
     audio.update(); 
     //const avg = audio.update();    
     
     //const t1 = Math.max(.2, gsap.utils.mapRange(30, 55, 0, .5, avg));
     //tree1Mat.uniforms.uTurbFactor.value = t1;
     let t2 = audio.data[4];
-    const h = savedVal.current*.7 + gsap.utils.mapRange(0, 255, 0, 1, t2);
+    const h = savedVal.current*.7 + gsap.utils.mapRange(50, 250, .4, 1.7, t2);
     houseMat.uniforms.uLight4Strength.value = h;
     groundMat.uniforms.uLight4Strength.value = h;
-    t2 = Math.max(.07, gsap.utils.mapRange(10, 60, .1, .33, t2));
+    t2 = Math.max(.07, gsap.utils.mapRange(20, 60, .1, .33, t2));
     tree2Mat.uniforms.uTurbFactor.value = t2;
     tree3Mat.uniforms.uTurbFactor.value = t2;
     tree1Mat.uniforms.uTurbFactor.value = t2;
-
     
   });
 
